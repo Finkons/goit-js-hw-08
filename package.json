@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "homepage": "https://github.com/Finkons/goit-js-hw-08/",
   "scripts": {
+    "deploy": "gh-pages -d dist",
     "dev": "parcel src/index.html",
     "build": "parcel build src/index.html --public-url /goit-js-hw-08/",
     "test": "echo \"Error: no test specified\" && exit 1"

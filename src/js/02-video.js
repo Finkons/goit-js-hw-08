@@ -3,7 +3,6 @@ import throttle from 'lodash.throttle';
 import Player from '@vimeo/player';
 
 const STORAGE_KEY = 'videoplayer-current-time';
-let timeupdate = {};
 
 const iframe = document.querySelector('iframe');
 const player = new Vimeo.Player(iframe);
@@ -15,17 +14,19 @@ player.on('play', function () {
 player.getVideoTitle().then(function (title) {
   console.log('title:', title);
 })
+let timeupdate = 0;
 
-function savecurrentTime(data) {
+function saveСurrentTime(data) {
   console.log(data);
-  localStorage.setItem(STORAGE_KEY, data.seconds);
+  timeupdate = data.seconds;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ timeupdate }));
 
-  if (data.seconds === data.duration) {
+  if (timeupdate === data.duration) {
     localStorage.removeItem(STORAGE_KEY);
   }
 }
 
-player.on('timeupdate', throttle(savecurrentTime, 1000));
+player.on('timeupdate', throttle(saveСurrentTime, 1000));
 
 const currentTime = localStorage.getItem(STORAGE_KEY);
 

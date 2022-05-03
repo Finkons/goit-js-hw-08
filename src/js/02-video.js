@@ -1,6 +1,9 @@
 
 import throttle from 'lodash.throttle';
+import Player from '@vimeo/player';
 
+const STORAGE_KEY = 'videoplayer-current-time';
+let timeupdate = {};
 
 const iframe = document.querySelector('iframe');
 const player = new Vimeo.Player(iframe);
@@ -11,23 +14,34 @@ player.on('play', function () {
 
 player.getVideoTitle().then(function (title) {
   console.log('title:', title);
-});
+})
 
-let timeupdate = 0;
-
-const onPlay = function (data) {
+function savecurrentTime(data) {
   console.log(data);
-  timeupdate = data.seconds;
-  localStorage.setItem('videoplayer-current-time', JSON.stringify({ timeupdate }));
-};
-player.on('timeupdate', throttle(onPlay, 1000));
+  localStorage.setItem(STORAGE_KEY, data.seconds);
 
-const timeFromStorage = localStorage.getItem('videoplayer-current-time');
-
-function checkForLocalstorageData() {
-  if (timeFromStorage) {
-    const parsedData = JSON.parse(timeFromStorage);
-    player.setCurrentTime(parsedData.timeupdate);
+  if (data.seconds === data.duration) {
+    localStorage.removeItem(STORAGE_KEY);
   }
 }
-checkForLocalstorageData();
+
+player.on('timeupdate', throttle(savecurrentTime, 1000));
+
+const currentTime = localStorage.getItem(STORAGE_KEY);
+
+player
+  .setCurrentTime(currentTime)
+  .then(function (seconds) {
+    seconds = currentTime;
+  })
+  .catch(function (error) {
+    switch (error.name) {
+      case 'RangeError':
+        seconds <= 0;
+        break;
+
+      default:
+        'OtherError'
+        break;
+    }
+  });

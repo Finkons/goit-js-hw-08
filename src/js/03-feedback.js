@@ -8,45 +8,52 @@ const refs = {
 
 const STORAGE_KEY = 'feedback-form-state';
 
-refs.form.addEventListener('submit', throttle(onFormSubmit, 500));
-refs.input.addEventListener('input', throttle(onTextareaInput, 500));
-refs.textarea.addEventListener('input', throttle(onTextareaInput, 500));
+refs.form.addEventListener('submit', onSubmit);
+refs.input.addEventListener('input', throttle(getUserData, 500));
+refs.textarea.addEventListener('input', throttle(getUserData, 500));
 
-
-function onFormSubmit(e) {
+function onSubmit(e) {
   e.preventDefault();
 
-  const { elements: { email, message } } = e.target;
+  const {
+    elements: { email, message },
+  } = e.currentTarget;
 
   if (email.value === '' || message.value === '') {
-    return alert('All fields must be filled!!!');
+    return alert('Please fill all fields');
   }
-  const formData = {
+
+  const inputData = {
     email: email.value,
     message: message.value,
   };
-  console.log('formData', formData);
+  console.log('inputData', inputData);
 
-  e.target.reset()
-  localStorage.removeItem(STORAGE_KEY)
+  e.currentTarget.reset();
+  localStorage.removeItem(STORAGE_KEY);
 }
 
-const userFormData = {};
+const userData = {};
 
-function onTextareaInput(e) {
+function getUserData(e) {
   userData['email'] = refs.input.value;
   userData['message'] = refs.textarea.value;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(userFormData))
+
+  saveData();
 }
 
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+}
 
-function populateFormData() {
-  const savedMessage = localStorage.getItem(STORAGE_KEY);
-  const parsedMessage = JSON.parse(savedMessage);
+function fillFormFromStorage() {
+  const savedDataText = localStorage.getItem(STORAGE_KEY);
+  const parsedData = JSON.parse(savedDataText);
 
-  if (parsedMessage) {
-    refs.input.value = parsedMessage.email;
-    refs.textarea.value = parsedMessage.message;
+  if (parsedData) {
+    refs.input.value = parsedData.email;
+    refs.textarea.value = parsedData.message;
   }
 }
-populateFormData()
+
+fillFormFromStorage();

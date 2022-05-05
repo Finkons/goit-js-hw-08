@@ -14,14 +14,12 @@ player.on('play', function () {
 player.getVideoTitle().then(function (title) {
   console.log('title:', title);
 })
-let timeupdate = 0;
 
 function saveСurrentTime(data) {
   console.log(data);
-  timeupdate = data.seconds;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ timeupdate }));
+  localStorage.setItem(STORAGE_KEY, data.seconds);
 
-  if (timeupdate === data.duration) {
+  if (data.seconds === data.duration) {
     localStorage.removeItem(STORAGE_KEY);
   }
 }
@@ -42,7 +40,7 @@ player
         break;
 
       default:
-        'OtherError'
+        'Locale storage clear';
         break;
     }
   });
